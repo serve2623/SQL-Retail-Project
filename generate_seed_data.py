@@ -78,24 +78,31 @@ for i in range (1, 51):
 
 
 orders = []
-address_id = [a['address_id'] for a in customer_addresses]
-customer_ids = [c['customer_id'] for c in customer]
 delivery_status = ['pending', 'shipped', 'delivered', 'cancelled']
 payment_status = ['pending', 'paid', 'failed', 'refunded']
-payment_method = ['credit_card','paypal','bank_transfer']
-for i in range (1, 201):
-     start = datetime(2024, 1, 1)
-     end = datetime(2026, 6, 30)
-     date = fake.date_time_between(start_date=start, end_date=end)
-     orders.append({
+payment_method = ['credit_card', 'paypal', 'bank_transfer']
+
+# Map each customer to the list of their own address IDs
+customer_address_lookup = {}
+for a in customer_addresses:
+    customer_address_lookup.setdefault(a['customer_id'], []).append(a['address_id'])
+
+customers_with_address = list(customer_address_lookup.keys())
+
+for i in range(1, 201):
+    start = datetime(2024, 1, 1)
+    end = datetime(2026, 6, 30)
+    date = fake.date_time_between(start_date=start, end_date=end)
+    chosen_customer_id = random.choice(customers_with_address)
+    orders.append({
         'order_id': i,
-        'customer_id': random.choice(customer_ids),
+        'customer_id': chosen_customer_id,
         'order_date': date,
         'delivery_status': random.choice(delivery_status),
-        'address_id': random.choice(address_id),
+        'address_id': random.choice(customer_address_lookup[chosen_customer_id]),
         'payment_status': random.choice(payment_status),
         'payment_method': random.choice(payment_method)
-     })
+    })
 
 
 order_item = []
