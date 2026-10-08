@@ -1,15 +1,18 @@
 
+EXPLAIN ANALYZE
 SELECT gender, COUNT(customer_id) AS gender_count
 FROM customers
 GROUP BY gender
 ORDER BY gender_count DESC;
 
+EXPLAIN ANALYZE
 SELECT 
     EXTRACT(YEAR FROM NOW()) - EXTRACT(YEAR FROM date_of_birth) AS customer_age, COUNT(customer_id) AS customer_count
 FROM customers
 GROUP BY customer_age
 ORDER BY customer_count DESC;
 
+EXPLAIN ANALYZE
 SELECT
     COUNT(orders.order_id) AS num_of_orders,
     Customer_Addresses.city
@@ -18,6 +21,7 @@ INNER JOIN Customer_Addresses ON orders.address_id = Customer_Addresses.address_
 GROUP BY Customer_Addresses.city
 ORDER BY num_of_orders DESC;
 
+EXPLAIN ANALYZE
 SELECT
     AVG(order_total) AS avg_revenue,
     subquery_table.payment_method

@@ -1,0 +1,39 @@
+                                                            QUERY PLAN                                                            
+----------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=17.47..17.50 rows=10 width=21) (actual time=0.605..0.609 rows=10 loops=1)
+   ->  Sort  (cost=17.47..17.58 rows=45 width=21) (actual time=0.603..0.606 rows=10 loops=1)
+         Sort Key: (sum(order_item.quantity)) DESC
+         Sort Method: top-N heapsort  Memory: 26kB
+         ->  HashAggregate  (cost=16.05..16.50 rows=45 width=21) (actual time=0.543..0.556 rows=45 loops=1)
+               Group Key: product.name
+               Batches: 1  Memory Usage: 24kB
+               ->  Hash Right Join  (cost=3.12..13.55 rows=500 width=17) (actual time=0.087..0.329 rows=500 loops=1)
+                     Hash Cond: (order_item.product_id = product.product_id)
+                     ->  Seq Scan on order_item  (cost=0.00..9.00 rows=500 width=8) (actual time=0.012..0.077 rows=500 loops=1)
+                     ->  Hash  (cost=2.50..2.50 rows=50 width=17) (actual time=0.049..0.050 rows=50 loops=1)
+                           Buckets: 1024  Batches: 1  Memory Usage: 11kB
+                           ->  Seq Scan on product  (cost=0.00..2.50 rows=50 width=17) (actual time=0.008..0.019 rows=50 loops=1)
+ Planning Time: 1.024 ms
+ Execution Time: 0.762 ms
+(15 rows)
+
+                                                               QUERY PLAN                                                                
+-----------------------------------------------------------------------------------------------------------------------------------------
+ Subquery Scan on subquery_table  (cost=36.73..41.23 rows=200 width=160) (actual time=1.604..1.661 rows=30 loops=1)
+   ->  WindowAgg  (cost=36.73..40.73 rows=200 width=128) (actual time=1.601..1.637 rows=30 loops=1)
+         ->  Sort  (cost=36.73..37.23 rows=200 width=96) (actual time=1.583..1.588 rows=30 loops=1)
+               Sort Key: (EXTRACT(year FROM orders.order_date)), (EXTRACT(month FROM orders.order_date))
+               Sort Method: quicksort  Memory: 26kB
+               ->  HashAggregate  (cost=25.58..29.08 rows=200 width=96) (actual time=1.477..1.497 rows=30 loops=1)
+                     Group Key: EXTRACT(year FROM orders.order_date), EXTRACT(month FROM orders.order_date)
+                     Batches: 1  Memory Usage: 48kB
+                     ->  Hash Join  (cost=6.50..19.33 rows=500 width=75) (actual time=0.129..0.822 rows=500 loops=1)
+                           Hash Cond: (order_item.order_id = orders.order_id)
+                           ->  Seq Scan on order_item  (cost=0.00..9.00 rows=500 width=15) (actual time=0.006..0.100 rows=500 loops=1)
+                           ->  Hash  (cost=4.00..4.00 rows=200 width=12) (actual time=0.096..0.097 rows=200 loops=1)
+                                 Buckets: 1024  Batches: 1  Memory Usage: 17kB
+                                 ->  Seq Scan on orders  (cost=0.00..4.00 rows=200 width=12) (actual time=0.006..0.043 rows=200 loops=1)
+ Planning Time: 0.651 ms
+ Execution Time: 1.755 ms
+(16 rows)
+
